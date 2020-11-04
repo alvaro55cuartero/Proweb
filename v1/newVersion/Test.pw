@@ -1,0 +1,5 @@
+var users = ["Admin", "User", "Guest"];
+
+for user in users {
+	mkdir("/" + user);
+}
