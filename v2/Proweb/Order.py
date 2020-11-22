@@ -1,3 +1,6 @@
+import Proweb.Output as Output
+
+
 from pathlib import Path
 from itertools import islice
 
@@ -21,17 +24,19 @@ def tree(dir_path: Path, level: int=-1, limit_to_directories: bool=False, length
 		pointers = [tee] * (len(contents) - 1) + [last]
 		for pointer, path in zip(pointers, contents):
 			if path.is_dir():
-				yield prefix + pointer + path.name
+				print(prefix + pointer, end = " ")
+				yield (0x02,path.name)
 				directories += 1
 				extension = branch if pointer == tee else space 
 				yield from inner(path, prefix=prefix+extension, level=level-1)
 			elif not limit_to_directories:
-				yield prefix + pointer + path.name
+				print(prefix + pointer, end = " ")
+				yield (0x0F , path.name)
 				files += 1
 	print(dir_path.name)
 	iterator = inner(dir_path, level=level)
-	for line in islice(iterator, length_limit):
-		print(line)
+	for (c ,line) in islice(iterator, length_limit):
+		Output.ColorPrint(c, line)
 	if next(iterator, None):
 		print(f'... length_limit, {length_limit}, reached, counted:')
 	print(f'\n{directories} directories' + (f', {files} files' if files else ''))
